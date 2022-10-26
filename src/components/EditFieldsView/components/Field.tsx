@@ -12,12 +12,15 @@ type FieldProps = {
 };
 
 type CustomButtonGroupProps = {
-  isDragging: Boolean;
+  $isDragging: Boolean;
 };
 
+// refer
+//    https://styled-components.com/docs/api#using-custom-props
+//    https://styled-components.com/docs/api#transient-props
 const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
-  opacity: ${({ isDragging }) => {
-    if (isDragging) {
+  opacity: ${({ $isDragging }) => {
+    if ($isDragging) {
       return 0.2;
     }
     return 1;
@@ -37,7 +40,7 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
       variant="contained"
       aria-label="outlined primary button group"
       ref={drag}
-      isDragging={isDragging}
+      $isDragging={isDragging}
     >
       <Button>
         <DragIndicatorIcon />
