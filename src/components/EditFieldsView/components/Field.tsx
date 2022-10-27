@@ -34,6 +34,11 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
+    item: () => {
+      return {
+        title,
+      };
+    },
   }));
 
   useEffect(() => {

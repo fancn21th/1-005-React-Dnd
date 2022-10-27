@@ -58,7 +58,7 @@ const DragLayer: FC<DragLayerProps> = () => {
   return (
     <Wrapper>
       <div style={getItemStyles(initialOffset, currentOffset, mouseOffset)}>
-        DragLayer
+        DragLayer {item?.title}
       </div>
     </Wrapper>
   );
