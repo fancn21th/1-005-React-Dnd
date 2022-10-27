@@ -51,10 +51,9 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
         fullWidth={true}
         variant="contained"
         aria-label="outlined primary button group"
-        ref={drag}
         $isDragging={isDragging}
       >
-        <Button>
+        <Button ref={drag}>
           <DragIndicatorIcon />
         </Button>
         <Button>{title}</Button>
