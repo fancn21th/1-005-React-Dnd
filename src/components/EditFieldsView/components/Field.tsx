@@ -1,4 +1,4 @@
-import { useEffect, FC } from "react";
+import { useRef, useEffect, FC } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -29,6 +29,8 @@ const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
 `;
 
 const Field: FC<FieldProps> = ({ title = "字段" }) => {
+  const dragRef = useRef(null);
+
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: ItemTypes.FIELD,
     collect: (monitor) => ({
@@ -45,6 +47,10 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
     dragPreview(getEmptyImage(), { captureDraggingState: true });
   }, [dragPreview]);
 
+  useEffect(() => {
+    drag(dragRef);
+  }, [drag]);
+
   return (
     <div>
       <CustomButtonGroup
@@ -53,7 +59,7 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
         aria-label="outlined primary button group"
         $isDragging={isDragging}
       >
-        <Button ref={drag}>
+        <Button ref={dragRef}>
           <DragIndicatorIcon />
         </Button>
         <Button>{title}</Button>
