@@ -23,7 +23,6 @@ type WrapperProps = {
 
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
-  border: 1px dashed black;
 
   ${({ showRightDropPositionIndicator, showLeftDropPositionIndicator }) => {
     if (showRightDropPositionIndicator) {
@@ -107,13 +106,8 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
     dragPreview(getEmptyImage(), { captureDraggingState: true });
   }, [dragPreview]);
 
-  useEffect(() => {
-    drag(dragRef);
-  }, [drag]);
-
-  useEffect(() => {
-    drop(dropRef);
-  }, [dropRef]);
+  drag(dragRef);
+  drop(dropRef);
 
   // derived state
   let showLeftDropPositionIndicator = false;
