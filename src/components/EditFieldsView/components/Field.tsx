@@ -8,6 +8,8 @@ import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import ItemTypes from "../../../utils/ItemTypes";
 
+// interface and type
+
 type FieldProps = {
   title: String;
 };
@@ -20,6 +22,8 @@ type WrapperProps = {
   showRightDropPositionIndicator: Boolean;
   showLeftDropPositionIndicator: Boolean;
 };
+
+// Styled Components
 
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
@@ -70,6 +74,8 @@ const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
     return 1;
   }};
 `;
+
+// FC
 
 const Field: FC<FieldProps> = ({ title = "字段" }) => {
   const dragRef = useRef(null);
@@ -128,6 +134,7 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
         hoverBoundingRect.width / 2;
   }
 
+  // JSX
   return (
     <Wrapper
       ref={dropRef}
