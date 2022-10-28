@@ -1,28 +1,34 @@
 import { FC } from "react";
+import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
 import Field from "./components/Field";
+import { useFields } from "../../hooks/UseFields";
+import type { FieldType } from "../../hooks/UseFields";
 
 interface EditFieldsViewProps {}
 
 const EditFieldsView: FC<EditFieldsViewProps> = () => {
+  const [fields, move] = useFields();
+
+  const renderFields = (items: FieldType[]) => {
+    return items.map((item, index) => {
+      return (
+        <Grid key={item.id} xs={4}>
+          <Field {...item} index={index} move={move} />
+        </Grid>
+      );
+    });
+  };
+
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2}>
-        <Grid xs={4}>
-          <Field title={"产品名称"} />
+    <Container maxWidth="lg">
+      <Box>
+        <Grid container spacing={2}>
+          {renderFields(fields)}
         </Grid>
-        <Grid xs={4}>
-          <Field title={"产品类别"} />
-        </Grid>
-        <Grid xs={4}>
-          <Field title={"产品价格"} />
-        </Grid>
-        <Grid xs={4}>
-          <Field title={"产品销量"} />
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </Container>
   );
 };
 

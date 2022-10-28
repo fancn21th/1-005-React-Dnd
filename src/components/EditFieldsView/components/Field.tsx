@@ -9,22 +9,22 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 import ItemTypes from "../../../utils/ItemTypes";
 
 // interface and type
-
 type FieldProps = {
-  title: String;
+  title: string;
+  index: number;
+  move: (from: number, to: number) => void;
 };
 
 type CustomButtonGroupProps = {
-  $isDragging: Boolean;
+  $isDragging: boolean;
 };
 
 type WrapperProps = {
-  showRightDropPositionIndicator: Boolean;
-  showLeftDropPositionIndicator: Boolean;
+  showRightDropPositionIndicator: boolean;
+  showLeftDropPositionIndicator: boolean;
 };
 
-// Styled Components
-
+// styled components
 const Wrapper = styled.div<WrapperProps>`
   position: relative;
 
@@ -63,7 +63,7 @@ const Wrapper = styled.div<WrapperProps>`
   }};
 `;
 
-// refer
+// refer to
 //    https://styled-components.com/docs/api#using-custom-props
 //    https://styled-components.com/docs/api#transient-props
 const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
@@ -76,8 +76,7 @@ const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
 `;
 
 // FC
-
-const Field: FC<FieldProps> = ({ title = "字段" }) => {
+const Field: FC<FieldProps> = ({ title, index, move }) => {
   const dragRef = useRef(null);
   const dropRef = useRef(null);
 
@@ -90,6 +89,7 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
     item: () => {
       return {
         title,
+        index,
       };
     },
   }));
@@ -97,7 +97,35 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
   // drop
   const [{ clientOffset, isOver }, drop] = useDrop({
     accept: ItemTypes.FIELD,
-    drop(item, monitor) {},
+    drop(item, monitor) {
+      // todo: not as any
+      const dragIndex = (monitor.getItem() as any).index;
+      const dropIndex = index;
+
+      // Don't replace item with themselves
+      if (dragIndex === dropIndex) {
+        return;
+      }
+
+      // determine whether drop in front of target or behind the target
+      const _clientOffset = monitor.getClientOffset();
+      const hoverBoundingRect = (
+        dropRef.current as any
+      ).getBoundingClientRect();
+
+      const insertLeft =
+        Math.abs(_clientOffset!.x - hoverBoundingRect.left) <
+        hoverBoundingRect.width / 2;
+
+      console.log({ insertLeft });
+
+      if (insertLeft) {
+        move(dragIndex, dropIndex);
+        return;
+      }
+
+      move(dragIndex, dropIndex + 1);
+    },
     collect: (monitor) => ({
       canDrop: monitor.canDrop(),
       clientOffset: monitor.getClientOffset(),
@@ -134,7 +162,7 @@ const Field: FC<FieldProps> = ({ title = "字段" }) => {
         hoverBoundingRect.width / 2;
   }
 
-  // JSX
+  // jsx
   return (
     <Wrapper
       ref={dropRef}
