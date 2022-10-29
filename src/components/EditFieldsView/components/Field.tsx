@@ -125,11 +125,11 @@ const Field: FC<FieldProps> = ({ title, id, move }) => {
       move(dragId, dropId, beforeDroppedItem);
     },
     collect: (monitor) => ({
-      canDrop: monitor.canDrop(),
+      // canDrop: monitor.canDrop(),
       clientOffset: monitor.getClientOffset(),
       isOver: monitor.isOver(),
-      isOverCurrent: monitor.isOver({ shallow: true }),
-      itemType: monitor.getItemType(),
+      // isOverCurrent: monitor.isOver({ shallow: true }),
+      // itemType: monitor.getItemType(),
     }),
   });
 

@@ -1,4 +1,5 @@
 import { useReducer, useCallback } from "react";
+import update from "immutability-helper";
 
 // type and interface
 export type FieldType = {
@@ -13,8 +14,9 @@ interface FieldsState {
 type FieldsAction = {
   type: "move";
   payload: {
-    from: number;
-    to: number;
+    dragId: number;
+    dropId: number;
+    beforeDroppedItem: boolean;
   };
 };
 
@@ -33,25 +35,44 @@ const initialState: FieldsState = {
       id: 3,
       title: "属性C",
     },
+    {
+      id: 4,
+      title: "属性D",
+    },
+    {
+      id: 5,
+      title: "属性E",
+    },
+    {
+      id: 6,
+      title: "属性F",
+    },
+    {
+      id: 7,
+      title: "属性G",
+    },
   ],
 };
 
 const reducer = (state: FieldsState, action: FieldsAction): FieldsState => {
   switch (action.type) {
     case "move":
-      const fromIndex = action.payload.from;
-      let toIndex = action.payload.to;
+      const preFields = state.fields;
+      const { dragId, dropId, beforeDroppedItem } = action.payload;
+      const dragIndex = preFields.findIndex((f) => f.id === dragId);
+      let dropIndex = preFields.findIndex((f) => f.id === dropId);
+      dropIndex = beforeDroppedItem ? dropIndex : dropIndex + 1;
 
-      let newFields: FieldType[] = [...state.fields];
+      if (dragIndex == dropIndex) {
+        return state;
+      }
 
-      // remove from position action.from
-      const from = newFields.splice(fromIndex, 1);
-
-      // if move ahead then adjust the inserted position
-      toIndex = fromIndex > toIndex ? toIndex : toIndex - 1;
-
-      // move the item to position action.to
-      newFields.splice(toIndex, 0, ...from);
+      const newFields = update(preFields, {
+        $splice: [
+          [dragIndex, 1],
+          [dropIndex, 0, preFields[dragIndex] as FieldType],
+        ],
+      });
 
       return {
         ...state,
@@ -64,19 +85,23 @@ const reducer = (state: FieldsState, action: FieldsAction): FieldsState => {
 
 export const useFields = (): [
   FieldType[],
-  (from: number, to: number) => void
+  (from: number, to: number, beforeDroppedItem: boolean) => void
 ] => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const move = useCallback((from: number, to: number) => {
-    dispatch({
-      type: "move",
-      payload: {
-        from,
-        to,
-      },
-    });
-  }, []);
+  const move = useCallback(
+    (dragId: number, dropId: number, beforeDroppedItem: boolean) => {
+      dispatch({
+        type: "move",
+        payload: {
+          dragId,
+          dropId,
+          beforeDroppedItem,
+        },
+      });
+    },
+    []
+  );
 
   return [state.fields, move];
 };
