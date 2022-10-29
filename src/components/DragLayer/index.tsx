@@ -25,7 +25,7 @@ function getItemStyles(
   }
 
   const { x, y } = mouseOffset || { x: 0, y: 0 };
-  // TODO adjust
+  // todo: adjust
   const transform = `translate(${x}px, ${y}px)`;
 
   return {
