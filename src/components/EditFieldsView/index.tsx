@@ -1,31 +1,73 @@
-import { FC } from "react";
+import { useState } from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
+import { useCallback } from "react";
 import Field from "./components/Field";
-import { useFields } from "../../hooks/UseFields";
+import update from "immutability-helper";
+
+// import { useFields } from "../../hooks/UseFields";
+
+import type { FC } from "react";
 import type { FieldType } from "../../hooks/UseFields";
 
 interface EditFieldsViewProps {}
 
 const EditFieldsView: FC<EditFieldsViewProps> = () => {
-  const [fields, move] = useFields();
+  const [fields, setFields] = useState([
+    {
+      id: 1,
+      title: "属性A",
+    },
+    {
+      id: 2,
+      title: "属性B",
+    },
+    {
+      id: 3,
+      title: "属性C",
+    },
+  ]);
 
-  const renderFields = (items: FieldType[]) => {
-    return items.map((item, index) => {
-      return (
-        <Grid key={item.id} xs={4}>
-          <Field {...item} index={index} move={move} />
-        </Grid>
-      );
-    });
-  };
+  const moveField = useCallback(
+    (dragId: number, dropId: number, beforeDroppedItem: boolean) => {
+      setFields((prevFields: FieldType[]) => {
+        const dragIndex = prevFields.findIndex((f) => f.id === dragId);
+        let dropIndex = prevFields.findIndex((f) => f.id === dropId);
+        dropIndex = beforeDroppedItem ? dropIndex : dropIndex + 1;
+
+        if (dragIndex == dropIndex) {
+          return prevFields;
+        }
+
+        const newFields = update(prevFields, {
+          $splice: [
+            [dragIndex, 1],
+            [dropIndex, 0, prevFields[dragIndex] as FieldType],
+          ],
+        });
+
+        return newFields;
+      });
+    },
+    []
+  );
+
+  // const [fields, move] = useFields();
+
+  const renderField = useCallback((item: FieldType) => {
+    return (
+      <Grid key={item.id} xs={4}>
+        <Field {...item} move={moveField} />
+      </Grid>
+    );
+  }, []);
 
   return (
     <Container maxWidth="lg">
       <Box>
         <Grid container spacing={2}>
-          {renderFields(fields)}
+          {fields.map((field) => renderField(field))}
         </Grid>
       </Box>
     </Container>

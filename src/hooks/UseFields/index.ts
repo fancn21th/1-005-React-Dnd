@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useCallback } from "react";
 
 // type and interface
 export type FieldType = {
@@ -41,6 +41,7 @@ const reducer = (state: FieldsState, action: FieldsAction): FieldsState => {
     case "move":
       const fromIndex = action.payload.from;
       let toIndex = action.payload.to;
+
       let newFields: FieldType[] = [...state.fields];
 
       // remove from position action.from
@@ -67,7 +68,7 @@ export const useFields = (): [
 ] => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const move = (from: number, to: number) => {
+  const move = useCallback((from: number, to: number) => {
     dispatch({
       type: "move",
       payload: {
@@ -75,7 +76,7 @@ export const useFields = (): [
         to,
       },
     });
-  };
+  }, []);
 
   return [state.fields, move];
 };

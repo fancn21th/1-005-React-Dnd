@@ -11,8 +11,12 @@ import ItemTypes from "../../../utils/ItemTypes";
 // interface and type
 type FieldProps = {
   title: string;
-  index: number;
-  move: (from: number, to: number) => void;
+  id: number;
+  move: (
+    dragIndex: number,
+    dropIndex: number,
+    beforeDroppedItem: boolean
+  ) => void;
 };
 
 type CustomButtonGroupProps = {
@@ -76,7 +80,7 @@ const CustomButtonGroup = styled(ButtonGroup)<CustomButtonGroupProps>`
 `;
 
 // FC
-const Field: FC<FieldProps> = ({ title, index, move }) => {
+const Field: FC<FieldProps> = ({ title, id, move }) => {
   const dragRef = useRef(null);
   const dropRef = useRef(null);
 
@@ -89,7 +93,7 @@ const Field: FC<FieldProps> = ({ title, index, move }) => {
     item: () => {
       return {
         title,
-        index,
+        id,
       };
     },
   }));
@@ -97,34 +101,28 @@ const Field: FC<FieldProps> = ({ title, index, move }) => {
   // drop
   const [{ clientOffset, isOver }, drop] = useDrop({
     accept: ItemTypes.FIELD,
-    drop(item, monitor) {
-      // todo: not as any
-      const dragIndex = (monitor.getItem() as any).index;
-      const dropIndex = index;
+    drop(item: FieldProps, monitor) {
+      const dragId = item.id;
+      const dropId = id;
 
       // Don't replace item with themselves
-      if (dragIndex === dropIndex) {
+      if (dragId === dropId) {
         return;
       }
 
       // determine whether drop in front of target or behind the target
       const _clientOffset = monitor.getClientOffset();
+
+      // todo: not as any
       const hoverBoundingRect = (
         dropRef.current as any
       ).getBoundingClientRect();
 
-      const insertLeft =
+      const beforeDroppedItem =
         Math.abs(_clientOffset!.x - hoverBoundingRect.left) <
         hoverBoundingRect.width / 2;
 
-      console.log({ insertLeft });
-
-      if (insertLeft) {
-        move(dragIndex, dropIndex);
-        return;
-      }
-
-      move(dragIndex, dropIndex + 1);
+      move(dragId, dropId, beforeDroppedItem);
     },
     collect: (monitor) => ({
       canDrop: monitor.canDrop(),
@@ -148,9 +146,8 @@ const Field: FC<FieldProps> = ({ title, index, move }) => {
   let showRightDropPositionIndicator = false;
 
   if (dropRef.current && clientOffset) {
-    const hoverBoundingRect = (
-      dropRef.current as HTMLDivElement
-    ).getBoundingClientRect();
+    // todo: not as any
+    const hoverBoundingRect = (dropRef.current as any).getBoundingClientRect();
 
     showLeftDropPositionIndicator =
       isOver &&
